@@ -4,13 +4,20 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
 import '@/styles/index.scss' // global css
 
 import App from './App'
 import store from './store'
 import router from './router'
+import VueQuillEditor from 'vue-quill-editor'
+
+import 'quill/dist/quill.core.css' // import styles
+import 'quill/dist/quill.snow.css' // for snow theme
+import 'quill/dist/quill.bubble.css' // for bubble theme
+
+Vue.use(VueQuillEditor, /* { default global options } */)
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -27,12 +34,30 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
-
+import * as filters from '@/utils/filters'
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 // set ElementUI lang to EN
-Vue.use(ElementUI, { locale })
+// Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
-// Vue.use(ElementUI)
-
+Vue.use(ElementUI)
+// 错误提示
+Vue.prototype.$wran = function(msg) {
+  this.$message({
+    showClose: true,
+    message: msg,
+    type: 'error'
+  })
+}
+// 成功提示
+Vue.prototype.$success = function(msg) {
+  this.$message({
+    showClose: true,
+    message: msg,
+    type: 'success'
+  })
+}
 Vue.config.productionTip = false
 
 new Vue({

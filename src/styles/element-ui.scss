@@ -43,7 +43,25 @@
   }
 }
 
-// to fix el-date-picker css style
-.el-range-separator {
-  box-sizing: content-box;
+.el-button{
+  &--primary{
+    background:rgba(0,210,165,1);
+    border-color: rgba(0,210,165,1);
+    &:hover,
+    &:active,
+    &:focus{
+      background:rgba(0,210,165,1);
+      border-color: rgba(0,210,165,1);
+    }
+  }
+  &--default{
+    color:rgba(0,210,165,1);
+    border-color: rgba(0,210,165,1);
+    &:hover,
+    &:active,
+    &:focus{
+      color:rgba(0,210,165,1);
+      border-color: rgba(0,210,165,1);
+    }
+  }
 }

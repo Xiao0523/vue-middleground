@@ -1,42 +1,104 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login /* logout */ } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { setLocal } from '@/utils/local'
+import { Message } from 'element-ui'
+// import { getExamine, getStore } from '@/api/business.js'
 
-const getDefaultState = () => {
-  return {
-    token: getToken(),
-    name: '',
-    avatar: ''
-  }
+const state = {
+  token: getToken(),
+  name: '',
+  avatar: '',
+  roles: [], // admin 管理员  store 店长
+  temp_Roles: [], // 登录时 临时 保存 角色
+  examineStatus: null,
+  messageToken: '',
+  // appKey: 'cpj2xarlchsmn',
+  appKey: 'pgyu6atqpmn2u',
+  messageInit: false,
+  storeStatus: null,
+  storeId: ''
 }
 
-const state = getDefaultState()
-
 const mutations = {
-  RESET_STATE: (state) => {
-    Object.assign(state, getDefaultState())
+  SET_USERID: (state, messageToken) => {
+    state.messageToken = messageToken
+    setLocal('messageToken', messageToken)
   },
   SET_TOKEN: (state, token) => {
     state.token = token
+    setToken(token)
   },
   SET_NAME: (state, name) => {
     state.name = name
+    setLocal('username', name)
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+    setLocal('avatar', avatar)
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
+    setLocal('examineRoles', roles)
+  },
+  SET_STATUS: (state, examineStatus) => {
+    state.examineStatus = examineStatus
+    setLocal('examineStatus', examineStatus)
+  },
+  SET_STORESTATUS: (state, storeStatus) => {
+    state.storeStatus = storeStatus
+    setLocal('storeStatus', storeStatus)
+  },
+  // 临时保存角色
+  SET_TEMP_ROLES: (state, roles) => {
+    state.temp_Roles = roles
+    setLocal('temp_Roles', roles)
+  },
+  SET_messageInit: (state, flag = true) => {
+    state.messageInit = flag
+  },
+  set_storeId: (state, id) => {
+    state.storeId = id
+    setLocal('storeId', id)
   }
 }
 
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { phone, code } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
+      login({ phone, code }).then(response => {
+        if (response.data.code) {
+          response.data.message && Message({
+            message: response.data.message || 'Error',
+            type: 'error',
+            duration: 5 * 1000
+          })
+        }
+        debugger
+        const { data } = response.data
+        commit('SET_TOKEN', data.personName)
+        commit('SET_AVATAR', data.password)
+        commit('SET_USERID', data.token)
+        // 临时保存
+        // 规避router 问题
+        // const routers = JSON.parse(data.json)
+        // console.log('data JSON.parse', typeof routers)
+        // asyncRoutes.push(routers)
+        commit('SET_NAME', data.personName)
+        commit('SET_STATUS', data.status || 0)
+        commit('set_storeId', data.uuid || 0)
+        // getExamine().then(res => {
+        //   if (res.code) this.$warn(res.message)
+        //   commit('SET_STATUS', res.data.status || 0)
+        //   commit('set_storeId', res.data.storeId || 0)
+        // })
+        // getStore().then(res => {
+        //   if (res.code) this.$warn(res.message)
+        //   commit('SET_STORESTATUS', res.data.status || 0)
+        // })
+        resolve(response)
       }).catch(error => {
         reject(error)
       })
@@ -46,46 +108,78 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      const roles = [state.token]
+      // roles must be a non-empty array
+      if (!roles || roles.length <= 0) {
+        reject('没有权限!')
+      }
+      commit('SET_ROLES', [...roles])
+
+      resolve({ roles })
+
+      /* getInfo(state.token).then(response => {
         const { data } = response
 
         if (!data) {
           reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { roles, name, avatar } = data
 
+        if (!roles || roles.length <= 0) {
+          reject('getInfo: roles must be a non-null array!')
+        }
+
+        commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
         reject(error)
-      })
+      }) */
     })
   },
 
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
+      commit('SET_TOKEN', '')
+      commit('SET_ROLES', [])
+      commit('SET_NAME', '')
+      commit('SET_AVATAR', '')
+      commit('SET_STATUS', '')
+      commit('SET_TEMP_ROLES', [])
+      commit('SET_USERID', '')
+      commit('SET_STORESTATUS', '')
+      commit('set_storeId', '')
+      removeToken()
+      resetRouter()
+      resolve()
+      /*  logout(state.token).then(() => {
+        commit('SET_TOKEN', '')
+        commit('SET_ROLES', [])
+        removeToken()
         resetRouter()
-        commit('RESET_STATE')
         resolve()
       }).catch(error => {
         reject(error)
-      })
-    })
-  },
-
-  // remove token
-  resetToken({ commit }) {
-    return new Promise(resolve => {
-      removeToken() // must remove  token  first
-      commit('RESET_STATE')
-      resolve()
+      }) */
     })
   }
+
+  // // remove token
+  // resetToken({ commit }) {
+  //   return new Promise(resolve => {
+  //     commit('SET_TOKEN', '')
+  //     commit('SET_ROLES', [])
+  //     commit('SET_NAME', '')
+  //     commit('SET_AVATAR', '')
+  //     commit('SET_STATUS', '')
+  //     commit('SET_TEMP_ROLES', [])
+  //     removeToken()
+  //     resolve()
+  //   })
+  // }
 }
 
 export default {
