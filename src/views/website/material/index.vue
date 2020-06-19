@@ -37,15 +37,6 @@
       <el-form-item class="search-item" label="whatsapp" prop="whatsapp">
         <el-input v-model.trim="form.whatsapp" placeholder="Please enter the" style="width:400px" />
       </el-form-item>
-      <el-form-item class="search-item" label="Promotional video" prop="facebook">
-        <div class="upload-box">
-          <input v-show="false" ref="input" type="file" accept="video/*" @change="fileChange">
-          <el-button :disabled="disableUpload" size="small" type="primary" @click="$refs.input.click()">
-            上传视频
-          </el-button>
-          <el-progress v-show="percentage" :percentage="percentage" :stroke-width="20" :color="customColors" style="width:400px" :text-inside="true" />
-        </div>
-      </el-form-item>
       <el-form-item label="上传照片">
         <el-upload
           class="uploader logo"
@@ -61,6 +52,22 @@
         </el-upload>
         <p class="upload-tips">只能上传jpg/png文件，建议尺寸为500x500px。</p>
         <input type="hidden">
+      </el-form-item>
+
+      <el-form-item class="search-item" label="Promotional video" prop="facebook">
+        <div class="upload-box">
+          <div v-for="item in form.videos " :key="item.videoUrl" class="video-box">
+            <span class="icon-close" @click="closeVideo(item.videoUrl)" />
+            <video class="video-border" controls autoplay :poster="item.videoCover">
+              <source :src="item.videoUrl" type="video/mp4">
+            </video>
+          </div>
+          <input v-show="false" ref="input" type="file" accept="video/*" @change="fileChange">
+          <el-button size="small" type="primary" @click="$refs.input.click()">
+            上传视频
+          </el-button>
+          <el-progress v-show="percentage" :percentage="percentage" :stroke-width="20" :color="customColors" style="width:400px" :text-inside="true" />
+        </div>
       </el-form-item>
       <el-row>
         <el-col :span="9">
@@ -99,7 +106,8 @@ export default {
         ],
         videoInfo: {
           videoCoverUrl: '',
-          videoUrl: ''
+          videoUrl: '',
+          videoId: ''
         },
         businessPic: ''
       },
@@ -117,7 +125,6 @@ export default {
       uploadFile: null,
       percentage: 0,
       uploader: null,
-      disableUpload: false,
       disableSubmit: true,
       customColors: [
         { color: '#f56c6c', percentage: 20 },
@@ -143,7 +150,6 @@ export default {
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-
   },
   beforeCreate() {}, // 生命周期 - 创建之前
   beforeMount() {}, // 生命周期 - 挂载之前
@@ -178,6 +184,7 @@ export default {
       this.dialogVisible = true
     },
     fileChange() {
+      debugger
       if (!event.target.files[0]) {
         return false
       }
@@ -189,27 +196,16 @@ export default {
       this.percentage = 0
       // 上传文件的size的单位为 字节(B)
       // 150兆字节(mb) = 157286400字节(B)
-      if (this.uploadFile.size <= 10485760) {
+      if (this.uploadFile.size <= 157286400) {
         this.getAuth(() => {
           // 给uploader大佬addFile
           this.getUploder()
-          // 以下三个参数默认为空
-          // var endpoint = ''
-          // var bucket = ''
-          // var objectPre = ''
-          // if(objectPre)
-          // {
-          //     object = objectPre +"/"+ event.target.files[i].name
-          // }
-          // STS的上传方式，需要在userData里指定Title
           var userData = '{"Vod":{"StorageLocation":"","Title":"' + this.uploadFile.name + '","Description":"默认描述信息暂无","CateId":"19","Tags":"测试视频"}}'
           this.uploader.addFile(this.uploadFile, '', '', '', userData)
           this.uploader.startUpload()
-          this.disableSubmit = false
         })
       } else {
-        this.disableSubmit = true
-        this.$message.error('上传的文件大小超过10M，请重新上传')
+        this.$message.error('上传的文件大小超过150M，请重新上传')
       }
     },
     getUploder() {
@@ -230,8 +226,6 @@ export default {
         'onUploadFailed': function(uploadInfo, code, message) {
           _this.$message.error(`文件上传失败：${message}`)
           // log(`onUploadFailed: file:${uploadInfo.file.name},code:${code}, message:${message}`)
-          _this.disableSubmit = true
-          _this.disableUpload = false
         },
         // 文件上传完成
         'onUploadSucceed': function(uploadInfo) {
@@ -245,14 +239,10 @@ export default {
             videoId: uploadInfo.videoId,
             videoCover: ''
           }
-          const ideos = []
-          ideos.push(videoitem)
-          _this.form.videos = ideos
+          _this.form.videos.push(videoitem)
           // _this.form.videos.push(videoitem)
           console.log(_this.form.videos)
           _this.$message.success('文件上传成功')
-          _this.disableSubmit = true
-          _this.disableUpload = false
         },
         // 文件上传进度
         'onUploadProgress': function(uploadInfo, totalSize, loadedPercent) {
@@ -307,6 +297,13 @@ export default {
         }
         this.$success(res.data.message)
       })
+    },
+    closeVideo(videoUrl) {
+      const videos = this.form.videos
+      const videosNew = videos.filter(item => {
+        return item.videoUrl !== videoUrl
+      })
+      this.form.videos = videosNew
     }
   } // 如果页面有keep-alive缓存功能，这个函数会触发
 }
@@ -402,5 +399,24 @@ export default {
   }
   .progress {
     margin-top: 10px;
+  }
+  .video-box{
+      position: relative;;
+     width: 400px;
+     height: 300x;
+     .icon-close{
+        position:absolute;
+        top:20px;
+        right:20px;
+        display:inline-block;
+        width:20px;
+        height:20px;
+        background:url('https://video.my51share.com/image/default/1287D2EAF19E4A1FA737389B98F012DD-6-2.png') no-repeat center;
+        cursor:pointer;
+        z-index:11;
+      }
+     .video-border{
+        width: 400px;
+     }
   }
 </style>
