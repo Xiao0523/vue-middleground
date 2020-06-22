@@ -50,7 +50,7 @@
           <img v-if="form.businessPic" :src="form.businessPic" class="logo">
           <i v-else class="el-icon-picture uploader-icon" />
         </el-upload>
-        <p class="upload-tips">只能上传jpg/png文件，建议尺寸为500x500px。</p>
+        <p class="upload-tips">只能上传jpg/png文件，建议尺寸为580x580px。</p>
         <input type="hidden">
       </el-form-item>
 
@@ -316,11 +316,11 @@ export default {
   padding: 30px
 }
   .title{
-  width:97px;
-  height:38px;
-  font-size:24px;
-  font-weight:600;
-  color:rgba(23,23,37,1);
+     width:97px;
+     height:38px;
+     font-size:24px;
+     font-weight:600;
+     color:rgba(23,23,37,1);
   line-height:38px;
   margin: 0;
   }
@@ -375,26 +375,26 @@ export default {
   }
   .uploader {
     display: block;
-    width: 107px;
-    height: 80px;
+    width: 200px;
+    height: 200px;
   }
   .logo {
     display: block;
-    width: 107px;
-    height: 80px;
+    width: 200px;
+    height: 200px;
   }
   .upload-tips {
     margin-top: 15px;
   }
   /deep/ {
     .el-upload--picture-card {
-      width: 107px;
-      height: 80px;
+      width: 200px;
+      height: 200px;
       line-height: 90px;
     }
     .el-upload-list--picture-card .el-upload-list__item {
-      width: 107px;
-      height: 80px;
+      width: 200px;
+      height: 200px;
     }
   }
   .progress {

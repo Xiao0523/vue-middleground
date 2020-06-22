@@ -177,6 +177,7 @@ export default {
         }
         this.isShow = false
         this.isMsg = true
+        this.loading = false
         this.countDown()
       })
     },
