@@ -89,6 +89,16 @@ export default {
   components: {},
   data() {
     // 这里存放数据
+    var checkAge = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('No null allowed, please enter!!'))
+      }
+      setTimeout(() => {
+        if (/.*[\u4e00-\u9fa5]+.*$/.test(value)) {
+          callback(new Error('Please enter English!!!'))
+        }
+      }, 1000)
+    }
     return {
       form: {
         companyName: '', //	公司名称
@@ -113,12 +123,49 @@ export default {
       },
       rules: {
         companyName: [
-          { required: true, message: 'Please enter the company name', trigger: 'blur' }
+          { required: true, message: 'Please enter the company name', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
         ],
         simpleDescription: [
-          { required: true, message: 'Please enter company profile', trigger: 'blur' }
+          { required: true, message: 'Please enter company profile', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        webUrl: [
+          { required: true, message: 'Please enter Jump website', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        realName: [
+          { required: true, message: 'Please enter Name', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        motto: [
+          { required: true, message: 'Please enter Personal motto', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        mobilePhone: [
+          { required: true, message: 'Please enter Mobile phone no', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: 'Please enter Email', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        twitter: [
+          { required: true, message: 'Please enter twitter', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        facebook: [
+          { required: true, message: 'Please enter Facebook', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        linkedIn: [
+          { required: true, message: 'Please enter LinkedIn', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
+        ],
+        whatsapp: [
+          { required: true, message: 'Please enter whatsapp', trigger: 'blur' },
+          { validator: checkAge, trigger: 'blur' }
         ]
-
       },
       videoUrl: Upload_Video, // 视频上传地址
       uploadUrl: Upload_Pic, // 图片上传地址
@@ -143,7 +190,8 @@ export default {
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
-  watch: {},
+  watch: {
+  },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.getWebsite()

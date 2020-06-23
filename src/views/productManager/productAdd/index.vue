@@ -203,7 +203,10 @@ export default {
     },
     cancel(formName) {
       this.$refs[formName].resetFields()
-      this.$router.go(-1)
+      // this.$router.go(-1)
+      this.$router.push({
+        path: '/productManager/productList'
+      })
     },
     onSubmit(formName) {
       const tags = this.ruleForm.tags
@@ -215,7 +218,10 @@ export default {
           return res.data.message && this.$wran(res.data.message)
         }
         this.$success(res.data.message)
-        this.$router.go(-1)
+        // this.$router.go(-1)
+        this.$router.push({
+          path: '/productManager/productList'
+        })
       })
     }
   } // 如果页面有keep-alive缓存功能，这个函数会触发

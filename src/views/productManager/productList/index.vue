@@ -50,6 +50,7 @@
             :action="Upload_File"
             :file-list="scope.row.fileList"
             :limit="1"
+            :disabled="true"
           />
         </template>
       </el-table-column>
@@ -205,12 +206,12 @@ export default {
     },
     newProduct() {
       this.$router.push({
-        path: '/product/new'
+        path: '/productManager/productAdd'
       })
     },
     edit(row) {
       this.$router.push({
-        path: '/product/edit',
+        path: '/productManager/productedit',
         query: {
           id: row.uuid
         }

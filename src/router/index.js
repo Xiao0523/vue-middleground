@@ -71,29 +71,29 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/product',
+    path: '/productManager',
     component: Layout,
     alwaysShow: true,
-    redirect: '/product',
-    name: 'product',
+    redirect: '/productManager/productList',
+    name: 'productManager',
     meta: { title: '产品管理', icon: 'nested' },
     children: [
       {
-        path: 'product',
-        name: 'product',
-        component: () => import('@/views/product/index'),
+        path: 'productList',
+        name: 'productList',
+        component: () => import('@/views/productManager/productList'),
         meta: { title: '产品列表', icon: 'form' }
       },
       {
-        path: 'new',
-        name: 'new',
-        component: () => import('@/views/product/new'),
+        path: 'productAdd',
+        name: 'productAdd',
+        component: () => import('@/views/productManager/productAdd'),
         meta: { title: '添加产品', icon: 'form' }
       },
       {
-        path: 'edit',
-        name: 'edit',
-        component: () => import('@/views/product/edit'),
+        path: 'productEdit',
+        name: 'productEdit',
+        component: () => import('@/views/productManager/productEdit'),
         meta: { title: '产品详细', icon: 'form' },
         hidden: true
       }
