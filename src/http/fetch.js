@@ -55,6 +55,7 @@ server.interceptors.response.use(
           message: error.response.data.data,
           type: 'error'
         })
+        this.$router.push(`/login?redirect=${this.$route.fullPath}`)
       } else {
         Message({
           message: error.response.data.message,

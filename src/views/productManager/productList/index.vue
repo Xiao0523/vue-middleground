@@ -173,6 +173,10 @@ export default {
       }
       getSupplierList(data).then(res => {
         debugger
+        if (res.data.code === 403) {
+          this.$router.replace({ path: '/login' })
+          this.$wran('请先登录')
+        }
         if (res.data.code) {
           return res.data.message && this.$wran(res.data.message)
         }
